@@ -36,6 +36,13 @@
 #----------------------------------------------------------------------
 SET(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
 CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
+
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.14.26.tar.gz"
+    SHA1 "45ac03944db2bc7fc55dfceca42d89ec7fa1dca2"
+)
+
 PROJECT( Assimp )
 
 # All supported options ###############################################
