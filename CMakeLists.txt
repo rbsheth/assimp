@@ -164,8 +164,12 @@ SET (PROJECT_VERSION "${ASSIMP_VERSION}")
 
 SET( ASSIMP_PACKAGE_VERSION "0" CACHE STRING "the package-specific version used for uploading the sources" )
 
-# Enable C++11 support globally
-set_property( GLOBAL PROPERTY CXX_STANDARD 11 )
+if(NOT HUNTER_ENABLED)
+  # Needed for openddl_parser config, no use of c++11 at this moment
+  add_definitions( -DOPENDDL_NO_USE_CPP11 )
+  # Enable C++11 support globally
+  set_property( GLOBAL PROPERTY CXX_STANDARD 11 )
+endif()
 
 IF(NOT IGNORE_GIT_HASH)
   # Get the current working branch
