@@ -58,7 +58,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <memory>
 
 #include "D3MFOpcPackage.h"
-#include <unzip.h>
+#include <minizip/unzip.h>
 #include <assimp/irrXMLWrapper.h>
 #include "3MFXmlTags.h"
 #include <assimp/fast_atof.h>

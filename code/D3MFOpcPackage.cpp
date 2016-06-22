@@ -56,7 +56,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <algorithm>
 #include <cassert>
-#include <unzip.h>
+#include <minizip/unzip.h>
 #include "3MFXmlTags.h"
 
 namespace Assimp {

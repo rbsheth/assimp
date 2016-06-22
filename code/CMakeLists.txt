@@ -829,6 +829,11 @@ SET( Extra_SRCS
 )
 SOURCE_GROUP( Extra FILES ${Extra_SRCS})
 
+if(HUNTER_ENABLED)
+  hunter_add_package(utf8)
+  find_package(utf8 CONFIG REQUIRED)
+endif(HUNTER_ENABLED)
+
 SET( Clipper_SRCS
   ../contrib/clipper/clipper.hpp
   ../contrib/clipper/clipper.cpp
@@ -1037,7 +1042,8 @@ TARGET_INCLUDE_DIRECTORIES ( assimp PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
 )
-TARGET_LINK_LIBRARIES(
+if(HUNTER_ENABLED)
+  TARGET_LINK_LIBRARIES(
     assimp
     PUBLIC
     polyclipping::polyclipping
@@ -1047,7 +1053,9 @@ TARGET_LINK_LIBRARIES(
     minizip::minizip
     ZLIB::zlib
     RapidJSON::rapidjson
-)
+    utf8::utf8
+  )
+endif(HUNTER_ENABLED)
 
 target_compile_definitions(assimp PUBLIC ASSIMP_BUILD_NO_OWN_ZLIB)
 
