@@ -57,7 +57,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "ByteSwapper.h"
 #include "StreamReader.h"
 #include "TinyFormatter.h"
-#include "../contrib/ConvertUTF/ConvertUTF.h"
+#include "convertutf/ConvertUTF.h"
 #include <assimp/IOSystem.hpp>
 #include <assimp/DefaultLogger.hpp>
 #include <assimp/scene.h>

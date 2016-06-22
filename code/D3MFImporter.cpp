@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assimp/IOStream.hpp>
 #include <assimp/IOSystem.hpp>
 #include <assimp/DefaultLogger.hpp>
-#include <contrib/unzip/unzip.h>
+#include <minizip/unzip.h>
 #include "irrXMLWrapper.h"
 #include "StringComparison.h"
 
