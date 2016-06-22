@@ -1,5 +1,5 @@
 set(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
-cmake_minimum_required( VERSION 2.8 )
+cmake_minimum_required( VERSION 3.0 )
 
 include("cmake/HunterGate.cmake")
 HunterGate(
@@ -163,29 +163,15 @@ if( CMAKE_COMPILER_IS_GNUCXX )
   set(LIBSTDC++_LIBRARIES -lstdc++)
 endif( CMAKE_COMPILER_IS_GNUCXX )
 
-# Search for external dependencies, and build them from source if not found
-# Search for zlib
-find_package(ZLIB)
-if( NOT ZLIB_FOUND )
-  message(STATUS "compiling zlib from souces")
-  include(CheckIncludeFile)
-  include(CheckTypeSize)
-  include(CheckFunctionExists)
-  # compile from sources
-  add_subdirectory(contrib/zlib)
-  set(ZLIB_FOUND 1)
-  set(ZLIB_LIBRARIES zlibstatic)
-  set(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/contrib/zlib ${CMAKE_CURRENT_BINARY_DIR}/contrib/zlib)
-else(NOT ZLIB_FOUND)
-  ADD_DEFINITIONS(-DASSIMP_BUILD_NO_OWN_ZLIB)
-  set(ZLIB_LIBRARIES_LINKED -lz)
-endif(NOT ZLIB_FOUND)
-INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
+hunter_add_package(ZLIB)
+find_package(ZLIB CONFIG REQUIRED)
+
+SET(ZLIB_LIBRARIES_LINKED -lz)
 
 # Search for unzip
-if (PKG_CONFIG_FOUND)
-  PKG_CHECK_MODULES(UNZIP minizip)
-endif (PKG_CONFIG_FOUND)
+hunter_add_package(minizip)
+find_package(minizip CONFIG REQUIRED)
+set(UNZIP_FOUND TRUE)
 
 IF ( ASSIMP_NO_EXPORT )
   ADD_DEFINITIONS( -DASSIMP_BUILD_NO_EXPORT)

@@ -4,7 +4,7 @@
 # 3) Add libassimp using the file lists (eliminates duplication of file names between
 #    source groups and library command)
 #
-cmake_minimum_required( VERSION 2.6 )
+cmake_minimum_required( VERSION 3.0 )
 SET( HEADER_PATH ../include/assimp )
 
 SET( COMPILER_HEADERS
@@ -590,18 +590,33 @@ SET( IrrXML_SRCS
   ../contrib/irrXML/irrXML.cpp
   ../contrib/irrXML/irrXML.h
 )
+if(HUNTER_ENABLED)
+  set(IrrXML_SRCS "")
+  hunter_add_package(irrXML)
+  find_package(irrXML CONFIG REQUIRED)
+endif()
 SOURCE_GROUP( IrrXML FILES ${IrrXML_SRCS})
 
 SET( ConvertUTF_SRCS
   ../contrib/ConvertUTF/ConvertUTF.h
   ../contrib/ConvertUTF/ConvertUTF.c
 )
+if(HUNTER_ENABLED)
+  set(ConvertUTF_SRCS "")
+  hunter_add_package(convertutf)
+  find_package(convertutf CONFIG REQUIRED)
+endif()
 SOURCE_GROUP( ConvertUTF FILES ${ConvertUTF_SRCS})
 
 SET( Clipper_SRCS
   ../contrib/clipper/clipper.hpp
   ../contrib/clipper/clipper.cpp
 )
+if(HUNTER_ENABLED)
+  set(Clipper_SRCS "")
+  hunter_add_package(polyclipping)
+  find_package(polyclipping CONFIG REQUIRED)
+endif()
 SOURCE_GROUP( Clipper FILES ${Clipper_SRCS})
 
 
@@ -618,6 +633,11 @@ SET( Poly2Tri_SRCS
   ../contrib/poly2tri/poly2tri/sweep/sweep_context.cc
   ../contrib/poly2tri/poly2tri/sweep/sweep_context.h
 )
+if(HUNTER_ENABLED)
+  set(Poly2Tri_SRCS "")
+  hunter_add_package(poly2tri)
+  find_package(poly2tri CONFIG REQUIRED)
+endif()
 SOURCE_GROUP( Poly2Tri FILES ${Poly2Tri_SRCS})
 
 SET( unzip_SRCS
@@ -627,6 +647,11 @@ SET( unzip_SRCS
   ../contrib/unzip/unzip.c
   ../contrib/unzip/unzip.h
 )
+if(HUNTER_ENABLED)
+  set(unzip_SRCS "")
+  hunter_add_package(minizip)
+  find_package(minizip CONFIG REQUIRED)
+endif()
 SOURCE_GROUP( unzip FILES ${unzip_SRCS})
 
 SET ( openddl_parser_SRCS
@@ -642,6 +667,11 @@ SET ( openddl_parser_SRCS
   ../contrib/openddlparser/include/openddlparser/DDLNode.h
   ../contrib/openddlparser/include/openddlparser/Value.h
 )
+if(HUNTER_ENABLED)
+  set(openddl_parser_SRCS "")
+  hunter_add_package(openddlparser)
+  find_package(openddlparser CONFIG REQUIRED)
+endif()
 SOURCE_GROUP( openddl_parser FILES ${openddl_parser_SRCS})
 
 # VC2010 fixes
@@ -697,10 +727,6 @@ SET( assimp_src
 )
 add_definitions( -DOPENDDLPARSER_BUILD )
 
-INCLUDE_DIRECTORIES(
-  ../contrib/openddlparser/include
-)
-
 IF (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
   SET( assimp_src ${assimp_src} ${C4D_SRCS})
   INCLUDE_DIRECTORIES(${C4D_INCLUDES})
@@ -708,7 +734,19 @@ ENDIF (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
 
 ADD_LIBRARY( assimp ${assimp_src} )
 
-TARGET_LINK_LIBRARIES(assimp ${ZLIB_LIBRARIES} ${OPENDDL_PARSER_LIBRARIES} )
+TARGET_LINK_LIBRARIES(
+    assimp
+    PUBLIC
+    convertutf::convertutf
+    polyclipping::polyclipping
+    irrXML::irrXML
+    openddlparser::openddl_parser
+    poly2tri::poly2tri
+    minizip::minizip
+    ZLIB::zlib
+)
+
+target_compile_definitions(assimp PUBLIC ASSIMP_BUILD_NO_OWN_ZLIB)
 
 if(ANDROID AND ASSIMP_ANDROID_JNIIOSYSTEM)
   set(ASSIMP_ANDROID_JNIIOSYSTEM_PATH port/AndroidJNI)
@@ -755,8 +793,7 @@ endif()
 # Build against external unzip, or add ../contrib/unzip so
 # assimp can #include "unzip.h"
 if (UNZIP_FOUND)
-  INCLUDE_DIRECTORIES(${UNZIP_INCLUDE_DIRS})
-  TARGET_LINK_LIBRARIES(assimp ${UNZIP_LIBRARIES})
+  target_link_libraries(assimp PUBLIC minizip::minizip)
 else (UNZIP_FOUND)
   INCLUDE_DIRECTORIES("../contrib/unzip")
 endif (UNZIP_FOUND)
