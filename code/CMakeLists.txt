@@ -44,7 +44,7 @@
 # 3) Add libassimp using the file lists (eliminates duplication of file names between
 #    source groups and library command)
 #
-cmake_minimum_required( VERSION 2.6 )
+cmake_minimum_required( VERSION 3.0 )
 SET( HEADER_PATH ../include/assimp )
 
 if(NOT ANDROID AND ASSIMP_ANDROID_JNIIOSYSTEM)
@@ -829,11 +829,15 @@ SET( Extra_SRCS
 )
 SOURCE_GROUP( Extra FILES ${Extra_SRCS})
 
-
 SET( Clipper_SRCS
   ../contrib/clipper/clipper.hpp
   ../contrib/clipper/clipper.cpp
 )
+if(HUNTER_ENABLED)
+  set(Clipper_SRCS "")
+  hunter_add_package(polyclipping)
+  find_package(polyclipping CONFIG REQUIRED)
+endif()
 SOURCE_GROUP( Clipper FILES ${Clipper_SRCS})
 
 SET( Poly2Tri_SRCS
@@ -849,6 +853,11 @@ SET( Poly2Tri_SRCS
   ../contrib/poly2tri/poly2tri/sweep/sweep_context.cc
   ../contrib/poly2tri/poly2tri/sweep/sweep_context.h
 )
+if(HUNTER_ENABLED)
+  set(Poly2Tri_SRCS "")
+  hunter_add_package(poly2tri)
+  find_package(poly2tri CONFIG REQUIRED)
+endif()
 SOURCE_GROUP( Poly2Tri FILES ${Poly2Tri_SRCS})
 
 SET( unzip_SRCS
@@ -858,7 +867,6 @@ SET( unzip_SRCS
   ../contrib/unzip/unzip.c
   ../contrib/unzip/unzip.h
 )
-SOURCE_GROUP( unzip FILES ${unzip_SRCS})
 
 SET( ziplib_SRCS
   ../contrib/zip/src/miniz.h
@@ -866,13 +874,20 @@ SET( ziplib_SRCS
   ../contrib/zip/src/zip.h
 )
 
+if(HUNTER_ENABLED)
+  set(unzip_SRCS "")
+  set(ziplib_SRCS "")
+  hunter_add_package(minizip)
+  find_package(minizip CONFIG REQUIRED)
+else(HUNTER_ENABLED)
 # TODO if cmake required version has been updated to >3.12.0, collapse this to the second case only
-if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
-	add_definitions(-DMINIZ_USE_UNALIGNED_LOADS_AND_STORES=0)
-else()
-	add_compile_definitions(MINIZ_USE_UNALIGNED_LOADS_AND_STORES=0)
-endif()
-
+  if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
+  	add_definitions(-DMINIZ_USE_UNALIGNED_LOADS_AND_STORES=0)
+  else()
+  	add_compile_definitions(MINIZ_USE_UNALIGNED_LOADS_AND_STORES=0)
+  endif()
+endif(HUNTER_ENABLED)
+SOURCE_GROUP( unzip FILES ${unzip_SRCS})
 SOURCE_GROUP( ziplib FILES ${ziplib_SRCS} )
 
 SET ( openddl_parser_SRCS
@@ -890,6 +905,11 @@ SET ( openddl_parser_SRCS
   ../contrib/openddlparser/include/openddlparser/DDLNode.h
   ../contrib/openddlparser/include/openddlparser/Value.h
 )
+if(HUNTER_ENABLED)
+  set(openddl_parser_SRCS "")
+  hunter_add_package(openddlparser)
+  find_package(openddlparser CONFIG REQUIRED)
+endif()
 SOURCE_GROUP( openddl_parser FILES ${openddl_parser_SRCS})
 
 SET ( open3dgc_SRCS
@@ -929,17 +949,22 @@ SOURCE_GROUP( open3dgc FILES ${open3dgc_SRCS})
 # RT-extensions is used in "contrib/Open3DGC/o3dgcTimer.h" for collecting statistics. Pointed file
 # has implementation for different platforms: WIN32, __MACH__ and other ("else" block).
 FIND_PACKAGE(RT QUIET)
-IF (RT_FOUND OR MSVC)
+IF (NOT HUNTER_ENABLED OR RT_FOUND OR MSVC)
   SET( ASSIMP_IMPORTER_GLTF_USE_OPEN3DGC 1 )
   ADD_DEFINITIONS( -DASSIMP_IMPORTER_GLTF_USE_OPEN3DGC=1 )
 ELSE ()
   SET (open3dgc_SRCS "")
-  MESSAGE (INFO " RT-extension not found. glTF import/export will be built without Open3DGC-compression.")
+  MESSAGE (INFO " Hunter enabled or RT-extension not found. glTF import/export will be built without Open3DGC-compression.")
   #!TODO: off course is better to remove statistics timers from o3dgc codec. Or propose to choose what to use.
 ENDIF ()
 
-INCLUDE_DIRECTORIES( "../contrib/rapidjson/include" )
-INCLUDE_DIRECTORIES( "../contrib" )
+IF (HUNTER_ENABLED)
+  hunter_add_package(RapidJSON)
+  find_package(RapidJSON CONFIG REQUIRED)
+ELSE (HUNTER_ENABLED)
+  INCLUDE_DIRECTORIES( "../contrib/rapidjson/include" )
+  INCLUDE_DIRECTORIES( "../contrib" )
+ENDIF (HUNTER_ENABLED)
 
 # VC2010 fixes
 if(MSVC10)
@@ -999,11 +1024,6 @@ SET( assimp_src
 )
 ADD_DEFINITIONS( -DOPENDDLPARSER_BUILD )
 
-INCLUDE_DIRECTORIES(
-    ${IRRXML_INCLUDE_DIR}
-    ../contrib/openddlparser/include
-)
-
 IF (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
   SET( assimp_src ${assimp_src} ${C4D_SRCS})
   INCLUDE_DIRECTORIES(${C4D_INCLUDES})
@@ -1017,6 +1037,19 @@ TARGET_INCLUDE_DIRECTORIES ( assimp PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../include>
   $<INSTALL_INTERFACE:${CMAKE_INSTALL_PREFIX}/include>
 )
+TARGET_LINK_LIBRARIES(
+    assimp
+    PUBLIC
+    polyclipping::polyclipping
+    irrXML::irrXML
+    openddlparser::openddl_parser
+    poly2tri::poly2tri
+    minizip::minizip
+    ZLIB::zlib
+    RapidJSON::rapidjson
+)
+
+target_compile_definitions(assimp PUBLIC ASSIMP_BUILD_NO_OWN_ZLIB)
 
 TARGET_LINK_LIBRARIES(assimp ${ZLIB_LIBRARIES} ${OPENDDL_PARSER_LIBRARIES} ${IRRXML_LIBRARY} )
 
@@ -1089,8 +1122,7 @@ ENDIF(APPLE)
 # Build against external unzip, or add ../contrib/unzip so
 # assimp can #include "unzip.h"
 if (UNZIP_FOUND)
-  INCLUDE_DIRECTORIES(${UNZIP_INCLUDE_DIRS})
-  TARGET_LINK_LIBRARIES(assimp ${UNZIP_LIBRARIES})
+  target_link_libraries(assimp PUBLIC minizip::minizip)
 else (UNZIP_FOUND)
   INCLUDE_DIRECTORIES("../")
 endif (UNZIP_FOUND)

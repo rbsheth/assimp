@@ -35,7 +35,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #----------------------------------------------------------------------
 SET(CMAKE_LEGACY_CYGWIN_WIN32 0) # Remove when CMake >= 2.8.4 is required
-CMAKE_MINIMUM_REQUIRED( VERSION 2.8 )
+CMAKE_MINIMUM_REQUIRED( VERSION 3.0 )
 
 include("cmake/HunterGate.cmake")
 HunterGate(
@@ -354,49 +354,62 @@ ENDIF( SYSTEM_IRRXML )
 
 # Search for external dependencies, and build them from source if not found
 # Search for zlib
-IF ( NOT ASSIMP_BUILD_ZLIB )
-  FIND_PACKAGE(ZLIB)
-ENDIF( NOT ASSIMP_BUILD_ZLIB )
+IF (HUNTER_ENABLED)
+  hunter_add_package(ZLIB)
+  find_package(ZLIB CONFIG REQUIRED)
 
-IF( NOT ZLIB_FOUND )
-  MESSAGE(STATUS "compiling zlib from sources")
-  INCLUDE(CheckIncludeFile)
-  INCLUDE(CheckTypeSize)
-  INCLUDE(CheckFunctionExists)
-
-  # Explicitly turn off ASM686 and AMD64 cmake options.
-  # The AMD64 option causes a build failure on MSVC and the ASM builds seem to have problems:
-  #		https://github.com/madler/zlib/issues/41#issuecomment-125848075
-  # Also prevents these options from "polluting" the cmake options if assimp is being
-  # included as a submodule.
-  set( ASM686 FALSE CACHE INTERNAL "Override ZLIB flag to turn off assembly" FORCE )
-  set( AMD64 FALSE CACHE INTERNAL "Override ZLIB flag to turn off assembly" FORCE )
-
-  # compile from sources
-  ADD_SUBDIRECTORY(contrib/zlib)
-  SET(ZLIB_FOUND 1)
-  SET(ZLIB_LIBRARIES zlibstatic)
-  SET(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/contrib/zlib ${CMAKE_CURRENT_BINARY_DIR}/contrib/zlib)
-  # need to ensure we don't link with system zlib or minizip as well.
-  SET(ASSIMP_BUILD_MINIZIP 1)
-ELSE(NOT ZLIB_FOUND)
-  ADD_DEFINITIONS(-DASSIMP_BUILD_NO_OWN_ZLIB)
   SET(ZLIB_LIBRARIES_LINKED -lz)
-ENDIF(NOT ZLIB_FOUND)
-INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
+ELSE (HUNTER_ENABLED)
+  IF ( NOT ASSIMP_BUILD_ZLIB )
+    FIND_PACKAGE(ZLIB)
+  ENDIF( NOT ASSIMP_BUILD_ZLIB )
+  
+  IF( NOT ZLIB_FOUND )
+    MESSAGE(STATUS "compiling zlib from sources")
+    INCLUDE(CheckIncludeFile)
+    INCLUDE(CheckTypeSize)
+    INCLUDE(CheckFunctionExists)
+  
+    # Explicitly turn off ASM686 and AMD64 cmake options.
+    # The AMD64 option causes a build failure on MSVC and the ASM builds seem to have problems:
+    #		https://github.com/madler/zlib/issues/41#issuecomment-125848075
+    # Also prevents these options from "polluting" the cmake options if assimp is being
+    # included as a submodule.
+    set( ASM686 FALSE CACHE INTERNAL "Override ZLIB flag to turn off assembly" FORCE )
+    set( AMD64 FALSE CACHE INTERNAL "Override ZLIB flag to turn off assembly" FORCE )
+  
+    # compile from sources
+    ADD_SUBDIRECTORY(contrib/zlib)
+    SET(ZLIB_FOUND 1)
+    SET(ZLIB_LIBRARIES zlibstatic)
+    SET(ZLIB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/contrib/zlib ${CMAKE_CURRENT_BINARY_DIR}/contrib/zlib)
+    # need to ensure we don't link with system zlib or minizip as well.
+    SET(ASSIMP_BUILD_MINIZIP 1)
+  ELSE(NOT ZLIB_FOUND)
+    ADD_DEFINITIONS(-DASSIMP_BUILD_NO_OWN_ZLIB)
+    SET(ZLIB_LIBRARIES_LINKED -lz)
+  ENDIF(NOT ZLIB_FOUND)
+  INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
+ENDIF(HUNTER_ENABLED)
 
 # Search for unzip
-IF ( NOT IOS )
-  IF( NOT ASSIMP_BUILD_MINIZIP )
-	  use_pkgconfig(UNZIP minizip)
-  ENDIF( NOT ASSIMP_BUILD_MINIZIP )
-ELSE ( NOT IOS )
-	IF(NOT BUILD_SHARED_LIBS)
+IF (HUNTER_ENABLED)
+  hunter_add_package(minizip)
+  find_package(minizip CONFIG REQUIRED)
+  set(UNZIP_FOUND TRUE)
+ELSE(HUNTER_ENABLED)
+  IF ( NOT IOS )
     IF( NOT ASSIMP_BUILD_MINIZIP )
-		  use_pkgconfig(UNZIP minizip)
+  	  use_pkgconfig(UNZIP minizip)
     ENDIF( NOT ASSIMP_BUILD_MINIZIP )
-	ENDIF (NOT BUILD_SHARED_LIBS)
-ENDIF ( NOT IOS )
+  ELSE ( NOT IOS )
+  	IF(NOT BUILD_SHARED_LIBS)
+      IF( NOT ASSIMP_BUILD_MINIZIP )
+  		  use_pkgconfig(UNZIP minizip)
+      ENDIF( NOT ASSIMP_BUILD_MINIZIP )
+  	ENDIF (NOT BUILD_SHARED_LIBS)
+  ENDIF ( NOT IOS )
+ENDIF(HUNTER_ENABLED)
 
 IF ( ASSIMP_NO_EXPORT )
   ADD_DEFINITIONS( -DASSIMP_BUILD_NO_EXPORT)
