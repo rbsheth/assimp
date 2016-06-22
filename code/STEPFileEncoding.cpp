@@ -44,7 +44,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "STEPFileEncoding.h"
 #include "fast_atof.h"
 
-#include "../contrib/ConvertUTF/ConvertUTF.h"
+#include "convertutf/ConvertUTF.h"
 #include <boost/scoped_array.hpp>
 
 using namespace Assimp;
