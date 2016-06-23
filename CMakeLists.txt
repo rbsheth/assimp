@@ -7,7 +7,7 @@ HunterGate(
     SHA1 "45ac03944db2bc7fc55dfceca42d89ec7fa1dca2"
 )
 
-PROJECT( Assimp )
+PROJECT( Assimp VERSION 3.2.0)
 
 option(BUILD_SHARED_LIBS "Build package with shared libraries." ON)
 if(NOT BUILD_SHARED_LIBS)
@@ -16,9 +16,9 @@ if(NOT BUILD_SHARED_LIBS)
 endif(NOT BUILD_SHARED_LIBS)
 
 # Define here the needed parameters
-set (ASSIMP_VERSION_MAJOR 3)
-set (ASSIMP_VERSION_MINOR 2)
-set (ASSIMP_VERSION_PATCH 0) # subversion revision?
+SET (ASSIMP_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+SET (ASSIMP_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+SET (ASSIMP_VERSION_PATCH ${PROJECT_VERSION_PATCH}) # subversion revision?
 set (ASSIMP_VERSION ${ASSIMP_VERSION_MAJOR}.${ASSIMP_VERSION_MINOR}.${ASSIMP_VERSION_PATCH})
 set (ASSIMP_SOVERSION 3)
 set (PROJECT_VERSION "${ASSIMP_VERSION}")
@@ -147,11 +147,6 @@ ELSE ( ASSIMP_ENABLE_BOOST_WORKAROUND )
   INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIRS} )
 ENDIF ( ASSIMP_ENABLE_BOOST_WORKAROUND )
 
-# cmake configuration files
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/assimp-config.cmake.in"         "${CMAKE_CURRENT_BINARY_DIR}/assimp-config.cmake" @ONLY IMMEDIATE)
-configure_file("${CMAKE_CURRENT_SOURCE_DIR}/assimp-config-version.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/assimp-config-version.cmake" @ONLY IMMEDIATE)
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/assimp-config.cmake"             "${CMAKE_CURRENT_BINARY_DIR}/assimp-config-version.cmake" DESTINATION "${ASSIMP_LIB_INSTALL_DIR}/cmake/assimp-${ASSIMP_VERSION_MAJOR}.${ASSIMP_VERSION_MINOR}" COMPONENT ${LIBASSIMP-DEV_COMPONENT})
-
 FIND_PACKAGE( DirectX )
 
 option ( ASSIMP_NO_EXPORT
@@ -241,6 +236,48 @@ else (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
   ADD_DEFINITIONS( -DASSIMP_BUILD_NO_C4D_IMPORTER )
 ENDIF (ASSIMP_BUILD_NONFREE_C4D_IMPORTER)
 
+####
+# Installation (https://github.com/forexample/package-example) {
+
+set(config_install_dir "lib/cmake/${PROJECT_NAME}")
+
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+
+# Configuration
+set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+set(targets_export_name "${PROJECT_NAME}Targets")
+set(namespace "${PROJECT_NAME}::")
+
+# Include module with fuction 'write_basic_package_version_file'
+include(CMakePackageConfigHelpers)
+
+# Note: PROJECT_VERSION is used as a VERSION
+write_basic_package_version_file(
+    "${version_config}" COMPATIBILITY SameMajorVersion
+)
+
+# Use variables:
+#   * targets_export_name
+#   * PROJECT_NAME
+configure_package_config_file(
+    "cmake/Config.cmake.in"
+    "${project_config}"
+    INSTALL_DESTINATION "${config_install_dir}"
+)
+
+install(
+    FILES "${project_config}" "${version_config}"
+    DESTINATION "${config_install_dir}"
+)
+
+install(
+    EXPORT "${targets_export_name}"
+    NAMESPACE "${namespace}"
+    DESTINATION "${config_install_dir}"
+)
+
+# }
 
 
 ADD_SUBDIRECTORY( code/ )
