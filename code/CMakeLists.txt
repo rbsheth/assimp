@@ -744,6 +744,7 @@ TARGET_LINK_LIBRARIES(
     poly2tri::poly2tri
     minizip::minizip
     ZLIB::zlib
+    Boost::boost
 )
 
 target_compile_definitions(assimp PUBLIC ASSIMP_BUILD_NO_OWN_ZLIB)

@@ -131,20 +131,25 @@ IF ( ASSIMP_ENABLE_BOOST_WORKAROUND )
   ADD_DEFINITIONS( -DASSIMP_BUILD_BOOST_WORKAROUND )
   MESSAGE( STATUS "Building a non-boost version of Assimp." )
 ELSE ( ASSIMP_ENABLE_BOOST_WORKAROUND )
-  SET( Boost_DETAILED_FAILURE_MSG ON )
-  IF ( NOT Boost_ADDITIONAL_VERSIONS )
-    SET( Boost_ADDITIONAL_VERSIONS "1.47" "1.47.0" "1.48.0" "1.48" "1.49" "1.49.0" "1.50" "1.50.0" "1.51" "1.51.0" "1.52.0" "1.53.0" "1.54.0" "1.55" "1.55.0" "1.56" "1.56.0" "1.57" "1.57.0" "1.58" "1.58.0" "1.59" "1.59.0")
-  ENDIF ( NOT Boost_ADDITIONAL_VERSIONS )
-  FIND_PACKAGE( Boost )
-  IF ( NOT Boost_FOUND )
-    MESSAGE( FATAL_ERROR
-      "Boost libraries (http://www.boost.org/) not found. "
-      "You can build a non-boost version of Assimp with slightly reduced "
-      "functionality by specifying -DASSIMP_ENABLE_BOOST_WORKAROUND=ON."
-    )
-  ENDIF ( NOT Boost_FOUND )
+  if(HUNTER_ENABLED)
+    hunter_add_package(Boost)
+    find_package(Boost CONFIG REQUIRED)
+  else()
+    SET( Boost_DETAILED_FAILURE_MSG ON )
+    IF ( NOT Boost_ADDITIONAL_VERSIONS )
+      SET( Boost_ADDITIONAL_VERSIONS "1.47" "1.47.0" "1.48.0" "1.48" "1.49" "1.49.0" "1.50" "1.50.0" "1.51" "1.51.0" "1.52.0" "1.53.0" "1.54.0" "1.55" "1.55.0" "1.56" "1.56.0" "1.57" "1.57.0" "1.58" "1.58.0" "1.59" "1.59.0")
+    ENDIF ( NOT Boost_ADDITIONAL_VERSIONS )
+    FIND_PACKAGE( Boost )
+    IF ( NOT Boost_FOUND )
+      MESSAGE( FATAL_ERROR
+        "Boost libraries (http://www.boost.org/) not found. "
+        "You can build a non-boost version of Assimp with slightly reduced "
+        "functionality by specifying -DASSIMP_ENABLE_BOOST_WORKAROUND=ON."
+      )
+    ENDIF ( NOT Boost_FOUND )
 
-  INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIRS} )
+    INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIRS} )
+  endif()
 ENDIF ( ASSIMP_ENABLE_BOOST_WORKAROUND )
 
 FIND_PACKAGE( DirectX )
