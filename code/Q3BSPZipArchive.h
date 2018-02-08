@@ -63,13 +63,13 @@ class IOSystem2Unzip {
 
         static voidpf open(voidpf opaque, const char* filename, int mode);
 
-        static uLong read(voidpf opaque, voidpf stream, void* buf, uLong size);
+        static uint32_t read(voidpf opaque, voidpf stream, void* buf, uint32_t size);
 
-        static uLong write(voidpf opaque, voidpf stream, const void* buf, uLong size);
+        static uint32_t write(voidpf opaque, voidpf stream, const void* buf, uint32_t size);
 
         static long tell(voidpf opaque, voidpf stream);
 
-        static long seek(voidpf opaque, voidpf stream, uLong offset, int origin);
+        static long seek(voidpf opaque, voidpf stream, uint32_t offset, int origin);
 
         static int close(voidpf opaque, voidpf stream);
 

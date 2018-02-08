@@ -71,13 +71,13 @@ voidpf IOSystem2Unzip::open(voidpf opaque, const char* filename, int mode) {
     return (voidpf) io_system->Open(filename, mode_fopen);
 }
 
-uLong IOSystem2Unzip::read(voidpf /*opaque*/, voidpf stream, void* buf, uLong size) {
+uint32_t IOSystem2Unzip::read(voidpf /*opaque*/, voidpf stream, void* buf, uint32_t size) {
     IOStream* io_stream = (IOStream*) stream;
 
     return io_stream->Read(buf, 1, size);
 }
 
-uLong IOSystem2Unzip::write(voidpf /*opaque*/, voidpf stream, const void* buf, uLong size) {
+uint32_t IOSystem2Unzip::write(voidpf /*opaque*/, voidpf stream, const void* buf, uint32_t size) {
     IOStream* io_stream = (IOStream*) stream;
 
     return io_stream->Write(buf, 1, size);
@@ -89,7 +89,7 @@ long IOSystem2Unzip::tell(voidpf /*opaque*/, voidpf stream) {
     return io_stream->Tell();
 }
 
-long IOSystem2Unzip::seek(voidpf /*opaque*/, voidpf stream, uLong offset, int origin) {
+long IOSystem2Unzip::seek(voidpf /*opaque*/, voidpf stream, uint32_t offset, int origin) {
     IOStream* io_stream = (IOStream*) stream;
 
     aiOrigin assimp_origin;
