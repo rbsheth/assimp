@@ -830,6 +830,9 @@ SET( Extra_SRCS
 SOURCE_GROUP( Extra FILES ${Extra_SRCS})
 
 if(HUNTER_ENABLED)
+  hunter_add_package(irrXML)
+  find_package(irrXML CONFIG REQUIRED)
+
   hunter_add_package(utf8)
   find_package(utf8 CONFIG REQUIRED)
 endif(HUNTER_ENABLED)
