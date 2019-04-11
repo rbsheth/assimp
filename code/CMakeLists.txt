@@ -887,6 +887,8 @@ if(HUNTER_ENABLED)
   set(ziplib_SRCS "")
   hunter_add_package(minizip)
   find_package(minizip CONFIG REQUIRED)
+  hunter_add_package(zip)
+  find_package(zip CONFIG REQUIRED)
 else(HUNTER_ENABLED)
 # TODO if cmake required version has been updated to >3.12.0, collapse this to the second case only
   if(${CMAKE_VERSION} VERSION_LESS "3.12.0")
@@ -957,7 +959,7 @@ SOURCE_GROUP( open3dgc FILES ${open3dgc_SRCS})
 # RT-extensions is used in "contrib/Open3DGC/o3dgcTimer.h" for collecting statistics. Pointed file
 # has implementation for different platforms: WIN32, __MACH__ and other ("else" block).
 FIND_PACKAGE(RT QUIET)
-IF (NOT HUNTER_ENABLED OR RT_FOUND OR MSVC)
+IF (NOT HUNTER_ENABLED AND (RT_FOUND OR MSVC))
   SET( ASSIMP_IMPORTER_GLTF_USE_OPEN3DGC 1 )
   ADD_DEFINITIONS( -DASSIMP_IMPORTER_GLTF_USE_OPEN3DGC=1 )
 ELSE ()
@@ -1057,6 +1059,7 @@ if(HUNTER_ENABLED)
     ZLIB::zlib
     RapidJSON::rapidjson
     utf8::utf8
+    zip::zip
   )
 endif(HUNTER_ENABLED)
 

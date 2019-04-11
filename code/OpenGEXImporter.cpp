@@ -212,7 +212,7 @@ static void propId2StdString( Property *prop, std::string &name, std::string &ke
     }
 
     if ( nullptr != prop->m_key ) {
-        name = prop->m_key->m_buffer;
+        name = prop->m_key->m_text.m_buffer;
         if ( Value::ddl_string == prop->m_value->m_type ) {
             key = prop->m_value->getString();
         }
@@ -497,7 +497,7 @@ static void getRefNames( DDLNode *node, std::vector<std::string> &names ) {
         for( size_t i = 0; i < ref->m_numRefs; i++ )  {
             Name *currentName( ref->m_referencedName[ i ] );
             if( nullptr != currentName && nullptr != currentName->m_id ) {
-                const std::string name( currentName->m_id->m_buffer );
+                const std::string name( currentName->m_id->m_text.m_buffer );
                 if( !name.empty() ) {
                     names.push_back( name );
                 }
@@ -1038,7 +1038,7 @@ void OpenGEXImporter::handleColorNode( ODDLParser::DDLNode *node, aiScene * /*pS
                 col.g = col4.g;
                 col.b = col4.b;
             }
-            const ColorType colType( getColorType( prop->m_key ) );
+            const ColorType colType( getColorType( &prop->m_key->m_text ) );
             if( DiffuseColor == colType ) {
                 m_currentMaterial->AddProperty( &col, 1, AI_MATKEY_COLOR_DIFFUSE );
             } else if( SpecularColor == colType ) {

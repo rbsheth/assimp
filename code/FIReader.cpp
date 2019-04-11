@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assimp/types.h>
 #include <assimp/MemoryIOWrapper.h>
 #include <assimp/irrXMLWrapper.h>
-#include "../contrib/utf8cpp/source/utf8.h"
+#include <utf8/utf8.h>
 #include <assimp/fast_atof.h>
 #include <stack>
 #include <map>

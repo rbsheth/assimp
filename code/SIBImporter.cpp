@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <assimp/StreamReader.h>
 #include <assimp/TinyFormatter.h>
 //#include "../contrib/ConvertUTF/ConvertUTF.h"
-#include "utf8/utf8.h"
+#include <utf8/utf8.h>
 #include <assimp/IOSystem.hpp>
 #include <assimp/DefaultLogger.hpp>
 #include <assimp/scene.h>
