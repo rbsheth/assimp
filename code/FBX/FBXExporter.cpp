@@ -1620,11 +1620,11 @@ void FBXExporter::WriteObjects ()
     
     //actual bone nodes in fbx, without parenting-up
     std::unordered_set<std::string> setAllBoneNamesInScene;
-    for(unsigned int m = 0; m < mScene->mNumMeshes; ++ m)
-    {
+    for(unsigned int m = 0; m < mScene->mNumMeshes; ++ m) {
         aiMesh* pMesh = mScene->mMeshes[m];
-        for(unsigned int b = 0; b < pMesh->mNumBones; ++ b)
+        for(unsigned int b = 0; b < pMesh->mNumBones; ++ b) {
             setAllBoneNamesInScene.insert(pMesh->mBones[b]->mName.data);
+        }
     }
     aiMatrix4x4 mxTransIdentity;
     
