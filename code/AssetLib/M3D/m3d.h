@@ -699,10 +699,6 @@ _inline static unsigned char _m3dstbi__get8(_m3dstbi__context *s) {
     return 0;
 }
 
-_inline static int _m3dstbi__at_eof(_m3dstbi__context *s) {
-    return s->img_buffer >= s->img_buffer_end;
-}
-
 static void _m3dstbi__skip(_m3dstbi__context *s, int n) {
     if (n < 0) {
         s->img_buffer = s->img_buffer_end;
@@ -1602,7 +1598,7 @@ static int _m3dstbi__compute_transparency16(_m3dstbi__png *z, _m3dstbi__uint16 t
     return 1;
 }
 
-static int _m3dstbi__expand_png_palette(_m3dstbi__png *a, unsigned char *palette, int len, int pal_img_n) {
+static int _m3dstbi__expand_png_palette(_m3dstbi__png *a, unsigned char *palette, int, int pal_img_n) {
     _m3dstbi__uint32 i, pixel_count = a->s->img_x * a->s->img_y;
     unsigned char *p, *temp_out, *orig = a->out;
 
@@ -1748,13 +1744,11 @@ static int _m3dstbi__parse_png_file(_m3dstbi__png *z, int scan, int req_comp) {
             }
             if ((int)(ioff + c.length) < (int)ioff) return 0;
             if (ioff + c.length > idata_limit) {
-                _m3dstbi__uint32 idata_limit_old = idata_limit;
                 unsigned char *p;
                 if (idata_limit == 0) idata_limit = c.length > 4096 ? c.length : 4096;
                 while (ioff + c.length > idata_limit)
                     idata_limit *= 2;
-                STBI_NOTUSED(idata_limit_old);
-                p = (unsigned char *)STBI_REALLOC_SIZED(z->idata, idata_limit_old, idata_limit);
+                p = (unsigned char *)STBI_REALLOC_SIZED(z->idata, 0, idata_limit);
                 if (p == NULL) return _m3dstbi__err("outofmem", "Out of memory");
                 z->idata = p;
             }
@@ -6149,9 +6143,9 @@ public:
 
 #endif /* M3D_CPPWRAPPER */
 
-#ifdef _MSC_VER
+#ifdef _MSC_VER > 1920 && !defined(__clang__)
 #    pragma warning(pop)
-#endif /* _MSC_VER */
+#endif /* _MSC_VER > 1920 */
 
 #endif /* __cplusplus */
 
