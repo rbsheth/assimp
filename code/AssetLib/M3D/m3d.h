@@ -4347,7 +4347,7 @@ unsigned char *m3d_save(m3d_t *model, int quality, int flags, unsigned int *size
     char vc_s, vi_s, si_s, ci_s, ti_s, bi_s, nb_s, sk_s, fc_s, hi_s, fi_s;
     char *sn = NULL, *sl = NULL, *sa = NULL, *sd = NULL;
     unsigned char *out = NULL, *z = NULL, weights[M3D_NUMBONE], *norm = NULL;
-    unsigned int i, j, k, l, n, len, chunklen, *length;
+    unsigned int i = 0, j = 0, k = 0, l = 0, n = 0, len = 0, chunklen = 0, *length = NULL;
     M3D_FLOAT scale = (M3D_FLOAT)0.0, min_x, max_x, min_y, max_y, min_z, max_z;
     M3D_INDEX last, *vrtxidx = NULL, *mtrlidx = NULL, *tmapidx = NULL, *skinidx = NULL;
     uint32_t idx, numcmap = 0, *cmap = NULL, numvrtx = 0, maxvrtx = 0, numtmap = 0, maxtmap = 0, numproc = 0;
