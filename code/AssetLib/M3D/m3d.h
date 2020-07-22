@@ -5578,9 +5578,9 @@ unsigned char *m3d_save(m3d_t *model, int quality, int flags, unsigned int *size
                         } else
                             out--;
                         break;
-                    case m3dpf_uint8: *out++ = m->prop[i].value.num; break;
+                    case m3dpf_uint8: *out++ = (uint8_t)m->prop[i].value.num; break;
                     case m3dpf_uint16:
-                        *((uint16_t *)out) = m->prop[i].value.num;
+                        *((uint16_t *)out) = (uint16_t)m->prop[i].value.num;
                         out += 2;
                         break;
                     case m3dpf_uint32:
@@ -5655,7 +5655,7 @@ unsigned char *m3d_save(m3d_t *model, int quality, int flags, unsigned int *size
                              face[i].data.normal[1] == M3D_UNDEF || face[i].data.normal[2] == M3D_UNDEF) ?
                                     0 :
                                     2);
-                *out++ = k;
+                *out++ = (uint8_t)k;
                 for (j = 0; j < 3; j++) {
                     out = _m3d_addidx(out, vi_s, vrtxidx[face[i].data.vertex[j]]);
                     if (k & 1)
