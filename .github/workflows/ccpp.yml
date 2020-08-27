@@ -2,7 +2,7 @@ name: C/C++ CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, rbsheth_hunter_docker ]
   pull_request:
     branches: [ master ]
 
