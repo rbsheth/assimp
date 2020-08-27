@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        name: [ubuntu-gcc, macos-clang, windows-msvc, ubuntu-clang]
+        name: [ubuntu-gcc, macos-clang, windows-msvc, ubuntu-clang, ubuntu-gcc-hunter, macos-clang-hunter, windows-msvc-hunter]
         # For Windows msvc, for Linux and macOS let's use the clang compiler, use gcc for Linux.
         include:
           - name: windows-msvc
@@ -32,6 +32,15 @@ jobs:
             os: ubuntu-latest
             cxx: g++
             cc: gcc
+          - name: ubuntu-gcc-hunter
+            os: ubuntu-latest
+            toolchain: ninja-gcc-cxx17-fpic
+          - name: macos-clang-hunter
+            os: macos-latest
+            toolchain: ninja-clang-cxx17-fpic
+          - name: windows-msvc-hunter
+            os: windows-latest
+            toolchain: ninja-vs-win64-cxx17
 
     steps:
     - uses: actions/checkout@v2
@@ -41,9 +50,17 @@ jobs:
     - uses: ilammy/msvc-dev-cmd@v1
     
     - uses: lukka/set-shell-env@v1
+      if: !endsWith(matrix.name, 'hunter')
       with:
         CXX: ${{ matrix.cxx }}
         CC: ${{ matrix.cc }}
+
+    - name: Checkout Hunter toolchains
+      if: endsWith(matrix.name, 'hunter')
+      uses: actions/checkout@v2
+      with:
+        repository: cpp-pm/polly
+        path: cmake/polly     
 
     - name: Cache DX SDK
       id: dxcache
@@ -66,6 +83,11 @@ jobs:
       id: windows_extra_cmake_args
       run: echo "::set-output name=args::'-DASSIMP_BUILD_ASSIMP_TOOLS=1 -DASSIMP_BUILD_ASSIMP_VIEW=1'"
     
+    - name: Set Hunter specific CMake arguments
+      if: contains(matrix.name, 'hunter')
+      id: hunter_extra_cmake_args
+      run: echo "::set-output name=args::'-DBUILD_SHARED_LIBS=OFF -DASSIMP_HUNTER_ENABLED=ON -DCMAKE_TOOLCHAIN_FILE=${{ github.workspace }}/cmake/polly/${ matrix.toolchain }.cmake'"
+
     - name: configure and build
       uses: lukka/run-cmake@v2
       env:
@@ -74,7 +96,7 @@ jobs:
       with:
         cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
         cmakeListsTxtPath: '${{ github.workspace }}/CMakeLists.txt'
-        cmakeAppendedArgs: '-GNinja -DCMAKE_BUILD_TYPE=Release ${{ steps.windows_extra_cmake_args.outputs.args }}'
+        cmakeAppendedArgs: '-GNinja -DCMAKE_BUILD_TYPE=Release ${{ steps.windows_extra_cmake_args.outputs.args }} ${{ steps.hunter_extra_cmake_args.outputs.args }}'
         buildWithCMakeArgs: '-- -v'
         buildDirectory: '${{ github.workspace }}/build/'
         
