@@ -8,7 +8,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc-9 \
     g++-9 \
     ca-certificates \
-    make
+    make \
+    git
 
 WORKDIR /root/assimp
 COPY ./cmake ./cmake
@@ -20,6 +21,8 @@ COPY ./test ./test
 COPY ./tools ./tools
 COPY ./*.in ./
 COPY CMakeLists.txt ./
+
+RUN git clone https://github.com/cpp-pm/polly cmake/polly
 
 RUN cmake -DBUILD_SHARED_LIBS=OFF -DASSIMP_BUILD_ASSIMP_TOOLS=ON -DASSIMP_BUILD_SAMPLES=OFF -DASSIMP_BUILD_TESTS=ON -DASSIMP_INSTALL_PDB=OFF -DASSIMP_IGNORE_GIT_HASH=ON -DASSIMP_HUNTER_ENABLED=ON -H. -B_builds/${TOOLCHAIN_NAME}-${BUILD_TYPE} -DCMAKE_TOOLCHAIN_FILE=./cmake/polly/${TOOLCHAIN_NAME}.cmake -DCMAKE_BUILD_TYPE=${BUILD_TYPE}
 
