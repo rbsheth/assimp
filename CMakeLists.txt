@@ -47,6 +47,7 @@ IF(ASSIMP_HUNTER_ENABLED)
   HunterGate(
     URL "https://github.com/cpp-pm/hunter/archive/v0.23.268.tar.gz"
     SHA1 "40ae51ce014380289bad5ec6b6e207660f69e804"
+    LOCAL
   )
 
   add_definitions(-DASSIMP_USE_HUNTER)
